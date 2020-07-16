@@ -6,9 +6,24 @@
         <h1>Timer</h1>
         <div id="currentName">Nothing</div>
         <div id="currentTime">00:00:00</div>
-        <label for="txtTimer">Timer: </label><input type="text" id="txtTimer" value="test:3000|hello:4000" />
-        <button id="btnStart" onclick="Timer.Start()">Start</button>
-        <button id="btnStop" onclick="Timer.Stop()">Stop</button>
+
+        <div>
+            <label for="txtTitle">Title: </label><input type="text" id="txtTitle" />
+        </div>
+
+        <div>
+            <label for="txtTimer">Timer: </label><input type="text" id="txtTimer" value="test:3000|hello:4000" />
+        </div>
+
+        <div>
+            <button id="btnStart" onclick="Timer.Start()">Start</button>
+            <button id="btnStop" onclick="Timer.Stop()">Stop</button>
+            <button id="btnSave" onclick="Timer.Save()">Save</button>
+        </div>
+
+        <div id="savedList">
+            
+        </div>
         <script src="./app.js" ></script>
     </body>
 </html>
