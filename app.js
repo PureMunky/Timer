@@ -3,9 +3,12 @@ const Timer = (function () {
 	const currentTime = document.getElementById('currentTime');
 	const txtTitle = document.getElementById('txtTitle');
 	const txtTimer = document.getElementById('txtTimer');
+	const currentTimerList = document.getElementById('currentTimerList');
 	const btnStart = document.getElementById('btnStart');
 	const btnStop = document.getElementById('btnStop');
 	const savedList = document.getElementById('savedList');
+	const localStorageKey = "Timers";
+	const qsKey = "timer";
 
 	var running = false;
 	var started = null;
@@ -65,6 +68,7 @@ const Timer = (function () {
 			Raw: txtTimer.value,
 			Timer: convertStringToTimer(txtTimer.value)
 		});
+		localStorage.setItem(localStorageKey, JSON.stringify(savedTimers));
 		displaySavedTimers();
 	}
 
@@ -93,6 +97,18 @@ const Timer = (function () {
 		}
 	}
 
+	function displayCurrentTimer() {
+		var listHTML = '<ul>';
+
+		for(var i = 0; i < currentTimers.length; i++) {
+			listHTML += '<li>' + currentTimers[i].Name + ' - ' + currentTimers[i].Duration + '</li>';
+		}
+
+		listHTML += '</ul>';
+
+		currentTimerList.innerHTML = listHTML;
+	}
+
 	function displaySavedTimers() {
 		var listHTML = '<ul>';
 
@@ -108,9 +124,27 @@ const Timer = (function () {
 	function loadSaved(i) {
 		txtTitle.value = savedTimers[i].Title;
 		txtTimer.value = savedTimers[i].Raw;
+		currentTimers = savedTimers[i].Timer;
+		displayCurrentTimer();
 	}
 
+	function load() {
+		var ls = localStorage.getItem(localStorageKey);
+
+		if(ls) {
+			savedTimers = JSON.parse(ls);
+		}
+		
+		var qs = new URLSearchParams(window.location.search);
+		var qsTimer = qs.get(qsKey);
+
+		txtTimer.value = qsTimer;
+		currentTimers = convertStringToTimer(qsTimer);
+	}
+
+	load();
 	displaySavedTimers();
+	displayCurrentTimer();
 
 	return {
 		Start: start,
