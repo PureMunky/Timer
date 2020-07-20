@@ -1,206 +1,219 @@
-const DisplayModule = (function() {
-	// TODO: Pretty display for running timer.
-	
-	const currentName = document.getElementById('currentName');
-	const currentTime = document.getElementById('currentTime');
-	const currentTimerList = document.getElementById('currentTimerList');
-	const savedList = document.getElementById('savedList');
+const DisplayModule = (function () {
+  // TODO: Pretty display for running timer.
 
-	return {
-		setName: function (s) { currentName.innerText = s; },
-		setTime: function (s) { currentTime.innerText = s; },
-		setTimerList: function (h) { currentTimerList.innerHTML = h; },
-		setSavedList: function (h) { savedList.innerHTML = h; }
-	};
+  const currentName = document.getElementById('currentName');
+  const currentTime = document.getElementById('currentTime');
+  const currentTimerList = document.getElementById('currentTimerList');
+  const savedList = document.getElementById('savedList');
+  const liveTime = document.getElementById('liveTime');
+
+  function setCurrentTime(current, remaining) {
+    currentTime.innerHTML = current + ' / ' + remaining;
+  }
+
+  function setTime(current, remaining) {
+    liveQueue.innerHTML = current + ' / ' + remaining;
+  }
+
+  return {
+    SetCurrentName: function (s) { currentName.innerText = s; },
+    SetCurrentTime: setCurrentTime,
+    setTimerList: function (h) { currentTimerList.innerHTML = h; },
+    setSavedList: function (h) { savedList.innerHTML = h; },
+    SetTime: setTime
+  };
 
 }());
 
 const ConvertModule = (function () {
-	function stringToTimer(strInput) {
-		var rtnValue = [];
+  function stringToTimer(strInput) {
+    var rtnValue = [];
 
-		if(strInput) {
-			rtnValue = strInput.split('|').map(x => {
-				return {
-					Name: x.split(':')[0],
-					Duration: x.split(':')[1]
-				};
-			});
-		}
+    if (strInput) {
+      rtnValue = strInput.split('|').map(x => {
+        return {
+          Name: x.split(':')[0],
+          Duration: x.split(':')[1]
+        };
+      });
+    }
 
-		return rtnValue;
-	}
+    return rtnValue;
+  }
 
-	function timerToString(timer) {
-		var rtnValue = '';
+  function timerToString(timer) {
+    var rtnValue = '';
 
-		console.log(timer);
+    for (var i = 0; i < timer.length; i++) {
+      rtnValue += (i > 0 ? '|' : '') + timer[i].Name + ':' + timer[i].Duration;
+    }
 
-		for(var i = 0; i < timer.length; i++) {
-			rtnValue += (i>0?'|':'') + timer[i].Name + ':' + timer[i].Duration;
-		}
-		
-		return rtnValue;
-	}
+    return rtnValue;
+  }
 
-	function stringToMilliseconds(strInput) {
-		// TODO: Convert input text to ms duration.
+  function stringToMilliseconds(strInput) {
+    // TODO: Convert input text to ms duration.
 
-		return strInput;
-	}
+    return strInput;
+  }
 
-	function millisecondsToString(ms) {
-		// TODO: Convert milliseconds to text.
+  function millisecondsToString(ms) {
+    // TODO: Convert milliseconds to text.
 
-		return ms;
-	}
+    return ms;
+  }
 
-	return {
-		StringToTimer: stringToTimer,
-		TimerToString: timerToString,
-		StringToMilliseconds: stringToMilliseconds,
-		MillisecondsToString: millisecondsToString
-	};
+  return {
+    StringToTimer: stringToTimer,
+    TimerToString: timerToString,
+    StringToMilliseconds: stringToMilliseconds,
+    MillisecondsToString: millisecondsToString
+  };
 }());
 
 const Timer = (function (Display, Convert) {
-	// TODO: Editing a queue/timer
-	// FIX: Saved overwritting
+  // TODO: Editing a queue/timer
+  // FIX: Saved overwritting
 
-	const txtTitle = document.getElementById('txtTitle');
-	const txtName = document.getElementById('txtName');
-	const txtDuration = document.getElementById('txtDuration');
-	const txtTimer = document.getElementById('txtTimer');
-	const localStorageKey = "Timers";
-	const qsKey = "timer";
+  const txtTitle = document.getElementById('txtTitle');
+  const txtName = document.getElementById('txtName');
+  const txtDuration = document.getElementById('txtDuration');
+  const txtTimer = document.getElementById('txtTimer');
+  const localStorageKey = "Timers";
+  const qsKey = "timer";
 
-	var running = false;
-	var started = null;
-	
-	var currentTimers = [];
+  var running = false;
+  var started = null;
 
-	var savedTimers = [];
+  var currentTimers = [];
 
-	function start() {
-		if(txtTimer.value.length > 0) {
-			currentTimers = Convert.StringToTimer(txtTimer.value);
-		}
+  var savedTimers = [];
 
-		running = true;
-		started = new Date();
-		tick();
-	}
+  function start() {
+    if (txtTimer.value.length > 0) {
+      currentTimers = Convert.StringToTimer(txtTimer.value);
+    }
 
-	function stop() {
-		running = false;
-	}
+    running = true;
+    started = new Date();
+    tick();
+  }
 
-	function save() {
-		savedTimers.push({
-			Title: txtTitle.value,
-			Timer: currentTimers
-		});
-		localStorage.setItem(localStorageKey, JSON.stringify(savedTimers));
-		displaySavedTimers();
-	}
+  function stop() {
+    running = false;
+  }
 
-	function add() {
-		currentTimers.push({
-			Name: txtName.value,
-			Duration: Convert.StringToMilliseconds(txtDuration.value)
-		});
-		displayCurrentTimer();
-	}
+  function save() {
+    savedTimers.push({
+      Title: txtTitle.value,
+      Timer: currentTimers
+    });
+    localStorage.setItem(localStorageKey, JSON.stringify(savedTimers));
+    displaySavedTimers();
+  }
 
-	function tick() {
-		let currentMS = new Date() - started;
-		let newMS = currentMS;
-		let found = false;
+  function add() {
+    currentTimers.push({
+      Name: txtName.value,
+      Duration: Convert.StringToMilliseconds(txtDuration.value)
+    });
+    displayCurrentTimer();
+  }
 
-		for(var i = 0; i < currentTimers.length && !found; i++) {
-			if(newMS < currentTimers[i].Duration) {
-				found = true;
-				Display.setName(currentTimers[i].Name);
-			} else {
-				newMS = newMS - currentTimers[i].Duration;
-			}
-		}
+  function tick() {
+    let currentMS = new Date() - started;
+    let newMS = currentMS;
+    let found = false;
+    let currentTotal = 0;
+    let totalMS = currentTimers.reduce(function (c, t) {
+      return parseInt(t.Duration) + c;
+    }, 0);
 
-		if(!found) {
-			Display.setName('Finished');
-			stop();
-		}
+    for (var i = 0; i < currentTimers.length && !found; i++) {
+      if (newMS < currentTimers[i].Duration) {
+        found = true;
+        Display.SetCurrentName(currentTimers[i].Name);
+        currentTotal = currentTimers[i].Duration;
+      } else {
+        newMS = newMS - currentTimers[i].Duration;
+      }
+    }
 
-		Display.setTime(currentMS);
-		if(running) {
-			setTimeout(tick, 100);
-		}
-	}
+    if (!found) {
+      Display.SetCurrentName('Finished');
+      stop();
+    }
 
-	function displayCurrentTimer() {
-		var listHTML = '<ul>';
+    Display.SetCurrentTime(newMS, currentTotal);
+    Display.SetTime(currentMS, totalMS - currentMS);
+    if (running) {
+      setTimeout(tick, 100);
+    }
+  }
 
-		for(var i = 0; i < currentTimers.length; i++) {
-			listHTML += '<li>' + currentTimers[i].Name + ' - ' + currentTimers[i].Duration + '</li>';
-		}
+  function displayCurrentTimer() {
+    var listHTML = '<ul>';
 
-		listHTML += '</ul>';
+    for (var i = 0; i < currentTimers.length; i++) {
+      listHTML += '<li>' + currentTimers[i].Name + ' - ' + currentTimers[i].Duration + '</li>';
+    }
 
-		Display.setTimerList(listHTML);
-	}
+    listHTML += '</ul>';
 
-	function displaySavedTimers() {
-		var listHTML = '<ul>';
+    Display.setTimerList(listHTML);
+  }
 
-		for(var i = 0; i < savedTimers.length; i++) {
-			listHTML += '<li><a href="#" onclick="Timer.QueueSaved(' + i + ')">' + savedTimers[i].Title + '</a></li>'
-		}
+  function displaySavedTimers() {
+    var listHTML = '<ul>';
 
-		listHTML += '</ul>';
+    for (var i = 0; i < savedTimers.length; i++) {
+      listHTML += '<li><a href="#" onclick="Timer.QueueSaved(' + i + ')">' + savedTimers[i].Title + '</a></li>'
+    }
 
-		Display.setSavedList(listHTML);
-	}
+    listHTML += '</ul>';
 
-	function queueSaved(i) {
-		txtTitle.value = savedTimers[i].Title;
-		txtTimer.value = Convert.TimerToString(savedTimers[i].Timer);
-		currentTimers = savedTimers[i].Timer;
+    Display.setSavedList(listHTML);
+  }
 
-		savedTimers.splice(i, 1);
-		displaySavedTimers();
-		displayCurrentTimer();
-	}
+  function queueSaved(i) {
+    txtTitle.value = savedTimers[i].Title;
+    txtTimer.value = Convert.TimerToString(savedTimers[i].Timer);
+    currentTimers = savedTimers[i].Timer;
 
-	function clearSaved() {
-		localStorage.removeItem(localStorageKey);
-		savedTimers = [];
-		displaySavedTimers();
-	}
+    displaySavedTimers();
+    displayCurrentTimer();
+  }
 
-	function load() {
-		var ls = localStorage.getItem(localStorageKey);
+  function clearSaved() {
+    localStorage.removeItem(localStorageKey);
+    savedTimers = [];
+    displaySavedTimers();
+  }
 
-		if(ls) {
-			savedTimers = JSON.parse(ls);
-		}
-		
-		var qs = new URLSearchParams(window.location.search);
-		var qsTimer = qs.get(qsKey);
+  function load() {
+    var ls = localStorage.getItem(localStorageKey);
 
-		txtTimer.value = qsTimer;
-		currentTimers = Convert.StringToTimer(qsTimer);
-		displaySavedTimers();
-		displayCurrentTimer();
-	}
+    if (ls) {
+      savedTimers = JSON.parse(ls);
+    }
 
-	load();
+    var qs = new URLSearchParams(window.location.search);
+    var qsTimer = qs.get(qsKey);
 
-	return {
-		Start: start,
-		Stop: stop,
-		Save: save,
-		QueueSaved: queueSaved,
-		ClearSaved: clearSaved,
-		Add: add
-	};
+    txtTimer.value = qsTimer;
+    currentTimers = Convert.StringToTimer(qsTimer);
+    displaySavedTimers();
+    displayCurrentTimer();
+  }
+
+  load();
+
+  return {
+    Start: start,
+    Stop: stop,
+    Save: save,
+    QueueSaved: queueSaved,
+    ClearSaved: clearSaved,
+    Add: add
+  };
 }(DisplayModule, ConvertModule));

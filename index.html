@@ -1,50 +1,55 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-    </head>
-    <body>
-        <h1>Timer</h1>
-        <div>
-            <div id="currentName">Nothing</div>
-            <div id="currentTime">00:00:00</div>
-        </div>
 
-        <h2>Current Queue</h2>
-        <div>
-            <label for="txtTitle">Title</label>
-            <input type="text" id="txtTitle" />
-        </div>
-        
-        <h3>New Step</h3>
-        <div>
-            <label for="txtName">Name</label>
-            <input type="text" id="txtName" />
-        </div>
-        <div>
-            <label for="txtDuration">Duration: </label>
-            <input type="text" id="txtDuration" />
-        </div>
+<head>
+  <title>Timer</title>
+</head>
 
-        <div>
-            <button id="btnAdd" onclick="Timer.Add()">Add Step</button>
-        </div>
+<body>
+  <h1>Timer</h1>
+  <div>
+    <div id="currentName">Nothing</div>
+    <div id="currentTime">00:00:00</div>
+    <div id="liveTime"></div>
+  </div>
 
-        <div style="display: none;">
-            <label for="txtTimer">Timer: </label><input type="text" id="txtTimer" value="test:3000|hello:4000" />
-        </div>
+  <h2>Current Queue</h2>
+  <div>
+    <label for="txtTitle">Title</label>
+    <input type="text" id="txtTitle" />
+  </div>
 
-        <h2>Queue</h2>
-        <div id="currentTimerList"></div>
+  <h3>New Step</h3>
+  <div>
+    <label for="txtName">Name</label>
+    <input type="text" id="txtName" />
+  </div>
+  <div>
+    <label for="txtDuration">Duration: </label>
+    <input type="text" id="txtDuration" />
+  </div>
 
-        <div>
-            <button id="btnStart" onclick="Timer.Start()">Start</button>
-            <button id="btnStop" onclick="Timer.Stop()">Stop</button>
-            <button id="btnSave" onclick="Timer.Save()">Save</button>
-            <button id="btnClear" onclick="Timer.ClearSaved()">Clear</button>
-        </div>
+  <div>
+    <button id="btnAdd" onclick="Timer.Add()">Add Step</button>
+  </div>
 
-        <h2>Saved Timers</h2>
-        <div id="savedList"></div>
-        <script src="./app.js" ></script>
-    </body>
+  <div style="display: none;">
+    <label for="txtTimer">Timer: </label><input type="text" id="txtTimer" value="test:3000|hello:4000" />
+  </div>
+
+  <h2>Queue</h2>
+  <div id="currentTimerList"></div>
+
+  <div>
+    <button id="btnStart" onclick="Timer.Start()">Start</button>
+    <button id="btnStop" onclick="Timer.Stop()">Stop</button>
+    <button id="btnSave" onclick="Timer.Save()">Save</button>
+    <button id="btnClear" onclick="Timer.ClearSaved()">Clear</button>
+  </div>
+
+  <h2>Saved Timers</h2>
+  <div id="savedList"></div>
+  <script src="./app.js"></script>
+</body>
+
 </html>
