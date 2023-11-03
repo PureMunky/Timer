@@ -5,3 +5,7 @@ const port = 3000
 app.get('/', (req, res) => {
     res.send('hey hey');
 })
+
+app.listen(port, () => {
+    console.log(`Listening on ${port}`)
+})
